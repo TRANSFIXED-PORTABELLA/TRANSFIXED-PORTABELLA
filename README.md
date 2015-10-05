@@ -72,7 +72,7 @@ Firebase Setup
 1. Go to the [Firebase](https://www.firebase.com) website and sign up for an account.
 2. In the homepage, create an app.
 3. Click on Manage App and navigate to Login & Auth.  Check the box next to "Enable Email & Password Authentication."
-4. Put the app URL in the utils file.
+4. In the app/www/js/services.js file, replace any instances of yotempest in the Database factory with your app name.  (There should be three instances, one each in ref, usersRef, and session)
 
 * Note: Installation instructions have changed since the start of this project.  This is a beta product in flux.
 
