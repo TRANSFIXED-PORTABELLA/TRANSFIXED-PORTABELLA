@@ -161,7 +161,7 @@ angular.module('starter.services', [])
     };
   })
 
-  .factory('Message', function($http, $ionicCoreSettings) {
+  .factory('Message', function($http, $ionicCoreSettings, Database, Escape) {
     // Define relevant info
     var privateKey = $ionicCoreSettings.get('privateKey');
     var appId = $ionicCoreSettings.get('app_id');
@@ -182,7 +182,7 @@ angular.module('starter.services', [])
         data: {
           "tokens": [token], // will later change to format ['your', 'target', 'tokens']
           "notification": {
-            "alert": "From: " + sender,
+            "alert": sender,
             "android":{
               "title": message,
               "iconColor": "purple", 
@@ -210,7 +210,25 @@ angular.module('starter.services', [])
       });
     };
 
+    //Used for creating the response before it is sent
+    var createResponse = function(friend, message, callback) {
+      var token;
+      //make a database call to get the user token of the recipient
+      var friendRef = Database.usersRef.child(friend);
+      friendRef.on('value', function (snapshot) {
+        token = snapshot.val().deviceToken;
+        
+        //find the current user
+        var currentUser = JSON.parse(window.localStorage[Database.session]).password.email;
+        var currentUsername = currentUser.slice(0, currentUser.indexOf('@'));
+        
+        //send the message to the user
+        sendMessage(currentUsername, message, token, callback)
+      });
+    };
+
     return {
-      sendMessage: sendMessage
+      sendMessage: sendMessage,
+      createResponse: createResponse
     };
   });
