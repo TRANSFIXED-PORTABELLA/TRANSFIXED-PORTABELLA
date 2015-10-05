@@ -4,18 +4,20 @@ angular.module('starter.messageController', ['ionic', 'starter.services','fireba
 
   $scope.sent = [];
 
+
+  // Stop input when max character length of 15 is reached
+  $scope.$watch('message', function(newVal, oldVal) {
+    if (newVal) {
+      if(newVal.length > 15) {
+        $scope.message = oldVal;
+      }
+    }
+  });
+
+  //sent a message to createResponse which is sent to sendMessage in the Message factory to send
+  //Potentially rename these functions to be more clear.
   $scope.sendMessage = function(friend, $index) {
-    // Find friend token
-    var token;
-    var friendRef = Database.usersRef.child(friend);
-    friendRef.on('value', function (snapshot) {
-      token = snapshot.val().deviceToken;
-    });
-    // Find current user for 'From'
-    var currentUser = JSON.parse(window.localStorage[Database.session]).password.email;
-    var currentUsername = currentUser.slice(0, currentUser.indexOf('@'));
-    // Send the message from current user and show sent message
-    Message.sendMessage(currentUsername, $scope.message, token, function () {
+    Message.createResponse(friend, $scope.message, function () {
       $scope.sent[$index] = true;
       $timeout(function() {
         $scope.sent[$index] = false;
@@ -24,15 +26,17 @@ angular.module('starter.messageController', ['ionic', 'starter.services','fireba
   };
 
   console.log(JSON.parse(window.localStorage[Database.session]).password.email);
-
+  //pull username from token (not secure) and escape username for db search
   var email = Escape.escape(JSON.parse(window.localStorage[Database.session]).password.email);
   var friends = Database.usersRef.child(email);
+  
   // Update on friend added
   var userRef = Database.usersRef.child(email).child('friends');
   userRef.on('value', function (snapshot) {
     var user = $firebaseObject(friends);
     user.$loaded()
     .then(function(data) {
+      //when the user is found add all the friends to an array to display in the messages page
       $scope.decodedFriends = {};
       for (var friend in data.friends) {
         $scope.decodedFriends[friend] = {

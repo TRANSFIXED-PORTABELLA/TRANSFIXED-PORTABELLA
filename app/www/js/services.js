@@ -162,6 +162,7 @@ angular.module('starter.services', [])
   })
 
   .factory('Message', function($http, $ionicCoreSettings, Database, $state) {
+
     // Define relevant info
     var privateKey = $ionicCoreSettings.get('privateKey');
     var appId = $ionicCoreSettings.get('app_id');
@@ -169,7 +170,7 @@ angular.module('starter.services', [])
     // Encode your key
     var auth = btoa(privateKey + ':');
 
-    var sendMessage = function(recipient, message, token, callback) {
+    var sendMessage = function(sender, message, token, callback) {
       // Build the request object
       var req = {
         method: 'POST',
@@ -182,18 +183,16 @@ angular.module('starter.services', [])
         data: {
           "tokens": [token], // will later change to format ['your', 'target', 'tokens']
           "notification": {
-            "alert": "From: " + recipient,
+            "alert": sender,
             "android":{
               "title": message,
               "iconColor": "purple", 
               "delayWhileIdle":true,
               "timeToLive":300,
-              "payload":{
-                "actions": [
-                  {title: "Nope"},
-                  {title: "Yep"}
-                ]
-              }
+              "actions": [
+                { icon: "ion-close", title: "NOPE"},
+                { icon: "ion-checkmark", title: "YEP", callback:"app.yep()"}
+              ]
             }
           }
         }
@@ -216,8 +215,26 @@ angular.module('starter.services', [])
       $state.go('auth');
     };
 
+    //Used for creating the response before it is sent
+    var createResponse = function(friend, message, callback) {
+      var token;
+      //make a database call to get the user token of the recipient
+      var friendRef = Database.usersRef.child(friend);
+      friendRef.on('value', function (snapshot) {
+        token = snapshot.val().deviceToken;
+        
+        //find the current user
+        var currentUser = JSON.parse(window.localStorage[Database.session]).password.email;
+        var currentUsername = currentUser.slice(0, currentUser.indexOf('@'));
+        
+        //send the message to the user
+        sendMessage(currentUsername, message, token, callback)
+      });
+    };
+
     return {
       sendMessage: sendMessage,
-      logout: logout
+      logout: logout,
+      createResponse: createResponse
     };
   });

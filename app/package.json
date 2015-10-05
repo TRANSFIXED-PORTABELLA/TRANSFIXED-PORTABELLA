@@ -18,6 +18,7 @@
     "cordova-plugin-device",
     "cordova-plugin-console",
     "cordova-plugin-whitelist",
+    "cordova-plugin-dialogs",
     "cordova-plugin-splashscreen",
     "com.ionic.keyboard",
     {

@@ -10,14 +10,14 @@
     <!-- Validation is needed for length of message, char limit not working -->
     <label class="item item-input item-floating-label">
         <span class="input-label">Message</span>
-        <input ng-model="$parent.message" type="text" placeholder="Message" ng-maxlength="15" required>
+        <input ng-model="$parent.message" type="text" placeholder="Message" name="message" required>
     </label>
   </form>
     <!-- Display your friends list -->
     <ion-list class="card">
       <ion-item ng-repeat="friend in decodedFriends" ng-click='sendMessage(friend.email, $index)'>
-          {{ friend.username }}
-          <span ng-show="sent[$index]">Message Sent</span>
+          <span>{{ friend.username }}</span>
+          <span style="float:right; color: lightgray" ng-show="sent[$index]">Message Sent</span>
       </ion-item>
     </ion-list>
    
