@@ -1,8 +1,8 @@
-# tempest?
+# Yep
 
->Tempest? helps people plan impromptu events with their closest friends.
+>Yep helps people plan impromptu events with their closest friends.
 
-Have you ever, on an uninspiring Sunday afternoon, gotten the urge hang out at your favorite spot? You'd rather not go alone but it's too last minute to coordinate with your crew. ‘Tempest?’ can help. Send a quick, one word invite to your inner circle and know, real time, who will be joining you. 
+Have you ever, on an uninspiring Sunday afternoon, gotten the urge hang out at your favorite spot? You'd rather not go alone but it's too last minute to coordinate with your crew. ‘Yep’ can help. Send a quick, one word invite to your inner circle and know, real time, who will be joining you. 
 
 ## Team
 
