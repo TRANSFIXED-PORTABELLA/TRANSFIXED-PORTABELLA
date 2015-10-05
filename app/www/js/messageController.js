@@ -58,4 +58,8 @@ angular.module('starter.messageController', ['ionic', 'starter.services','fireba
     return false;
   };
 
+  $scope.logout = function() {
+    Message.logout(Database, $state);
+  };
+
 });

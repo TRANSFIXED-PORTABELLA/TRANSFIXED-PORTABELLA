@@ -5,6 +5,7 @@ angular.module('starter.services', [])
     console.log($firebaseObject(ref));
     var usersRef = new Firebase('https://yotempest.firebaseio.com/users');
     var session = 'firebase:session::' + 'yotempest';
+
     return {
       ref: ref,
       usersRef: usersRef,
@@ -133,10 +134,9 @@ angular.module('starter.services', [])
             }
           });
           callback();
-        };
+        }
       });
     };
-    
     var login = function(email, password, $state, callback) {
       Database.ref.authWithPassword({
         email: email,
@@ -154,14 +154,14 @@ angular.module('starter.services', [])
       });
       callback();
     };
-
+   
     return {
       createUser: createUser,
       login: login
     };
   })
 
-  .factory('Message', function($http, $ionicCoreSettings) {
+  .factory('Message', function($http, $ionicCoreSettings, Database, $state) {
     // Define relevant info
     var privateKey = $ionicCoreSettings.get('privateKey');
     var appId = $ionicCoreSettings.get('app_id');
@@ -211,8 +211,13 @@ angular.module('starter.services', [])
         console.log("Ionic Push: Push error...");
       });
     };
+    var logout = function(Database, $state) {
+      Database.ref.unauth();
+      $state.go('auth');
+    };
 
     return {
-      sendMessage: sendMessage
+      sendMessage: sendMessage,
+      logout: logout
     };
   });
