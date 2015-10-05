@@ -1,7 +1,7 @@
 angular.module('starter.authController', ['ionic', 'starter.services'])
 
 
-.controller('AuthController', function ($scope, Auth, $rootScope, $state, $log, $ionicUser, $ionicPush, Escape, Database) {
+.controller('AuthController', function ($scope, Auth, $rootScope, $state, $log, $ionicUser, $ionicPush, Escape, Database, Message) {
   //form properties
   $scope.inputs = {
     email: null,
@@ -79,12 +79,21 @@ angular.module('starter.authController', ['ionic', 'starter.services'])
         // Handle new push notifications here
         $log.info(notification);
         $log.info(JSON.stringify(notification));
+        var friend = notification.message;
+        $log.info(friend);
         switch( notification.event ){
          case 'message':
           //alert(notification.payload.title + " " + notification.message);
-          navigator.notification.confirm(notification.message, function(btn) {
+          navigator.notification.confirm(friend, function(btn) {
             if(btn === 1) {
+              //format friend for sending
+              friend = friend + "@yotempest.com";
+              friendId = Escape.escape(friend);
               //send yes response
+              Message.createResponse(friendId, 'Yep', function (){
+                //replace with toast message
+                alert("Sent");
+              });
             }
           },
           notification.payload.title,
