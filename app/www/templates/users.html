@@ -1,3 +1,9 @@
+<ion-header-bar class="bar bar-header bar-royal">
+  <h1 class="title">Search Users</h1>
+  <button class="button button-icon" ng-click="logout()">
+        Logout
+  </button>
+</ion-header-bar>
 <ion-view view-title="Users" class="users-page">
   <ion-content>
     <form name="userForm" ng-submit="fetchUserByEmail()">
@@ -22,7 +28,6 @@
 
   </ion-content>
     <ion-footer-bar class="bar-calm">
-      <button class="button button-icon ion-chevron-left" style="float: left;" ng-click="navToMessage()">
-      </button>
+      <div class="title"><i class="button button-icon ion-chatbox-working" ng-click="navToMessage()"></i></div>
     </ion-footer-bar>
 </ion-view>
