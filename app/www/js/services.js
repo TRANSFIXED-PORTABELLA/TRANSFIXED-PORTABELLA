@@ -1,5 +1,6 @@
 angular.module('starter.services', [])
-
+  
+  //A simple factory for our firebase/DB calls, so the URL's are managed in a single location. 
   .factory('Database', function($firebaseObject) {
     var ref = new Firebase('https://yotempest.firebaseio.com');
     console.log($firebaseObject(ref));
@@ -13,6 +14,7 @@ angular.module('starter.services', [])
     };
   })
 
+  //Helper function for escaping emails correctly to input them as usernames to Firebase (no fullstops in usernames)
   .factory('Escape', function () {
     var escape = function(email) {
       return encodeURIComponent(email).replace('.', '%2E');
@@ -25,37 +27,23 @@ angular.module('starter.services', [])
 
   .factory('User', function($firebaseArray, $firebaseObject, Database, Escape) {
 
+    var checkExists = function(dataRef, username) {
+      var doesExist;
+      dataRef.child(username).once('value', function(snapshot) {
+        var exists = (snapshot.val() !== null);
+        doesExist = !!exists;
+      });
+      return doesExist;
+    };
+
     var fetchUserByEmail = function(email) {
       email = Escape.escape(email);
 
       var userRef = Database.usersRef.child(email);
-
-      var USERS_LOCATION = Database.usersRef;
-
-      var userExistsCallback = function(userId, exists) {
-        if (exists) {
-          console.log('user ' + userId + ' exists!');
-          return true;
-        } else {
-          console.log('user ' + userId + ' does not exist!');
-          return false;
-        }
-      };
-
-      // Tests to see if /users/<userId> has any data. 
-      var checkIfUserExists = function(userId) {
-        var userExists;
-        var usersRef = USERS_LOCATION;
-        usersRef.child(userId).once('value', function(snapshot) {
-          var exists = (snapshot.val() !== null);
-          userExists = userExistsCallback(userId, exists);
-        });
-        return userExists;
-      };
-
       var user = $firebaseObject(userRef);
 
-      if (checkIfUserExists(email)) {
+
+      if (checkExists(Database.usersRef, email)) {
         return user;
       } else {
         return null;
@@ -65,33 +53,14 @@ angular.module('starter.services', [])
 
     var isCurrentFriend = function(email) {
       email = Escape.escape(email);
-
-      var friendExistsCallback = function(userId, exists) {
-        if (exists) {
-          console.log('friend ' + userId + ' exists!');
-          return true;
-        } else {
-          console.log('friend ' + userId + ' does not exist!');
-          return false;
-        }
-      };
-
+      //pull current user from localStorage
       var currentUser = Escape.escape(JSON.parse(window.localStorage[Database.session]).password.email);
+      // pull the current user found in local storage from the DB
       var friendRef = Database.usersRef.child(currentUser).child('friends').child(email);
-
-      var checkCurrentFriend = function(userId) {
-        var friendsRef = Database.usersRef.child(currentUser).child('friends');
-        var friendExists;
-        friendsRef.child(userId).once('value', function(snapshot) {
-          var exists = (snapshot.val() !== null);
-          friendExists = friendExistsCallback(userId, exists);
-        });
-        return friendExists;
-      };
 
       var friend = $firebaseObject(friendRef);
 
-      if (checkCurrentFriend(email)) {
+      if (checkExists(Database.usersRef.child(currentUser).child('friends'), email)) {
         return friend;
       } else {
         return null;
@@ -107,6 +76,7 @@ angular.module('starter.services', [])
   .factory('Auth', function(Database, Escape, $state) {
 
     var createUser = function(email, password, callback) {
+      //create a new user in the db
       Database.ref.createUser({
           email: email,
           password: password
@@ -124,12 +94,13 @@ angular.module('starter.services', [])
           }
         } else {
           console.log('Successfully created user account with uid:', userData.uid);
+          //now that the user is authenticated, add them to the user accessable firebase DB
           email = Escape.escape(email);
           var userRef = Database.usersRef;
           var uid = userData.uid;
           userRef.update({
             [email]: {
-              deviceToken: '',
+              deviceToken: '', //device token is updated later when it has been recieved from GCM
               friends: {}
             }
           });
@@ -138,13 +109,16 @@ angular.module('starter.services', [])
       });
     };
     var login = function(email, password, $state, callback) {
+      //check the DB for the user account
       Database.ref.authWithPassword({
         email: email,
         password: password
       }, function(error, authData) {
         if (error) {
+          //Should pass something to update the view
           console.log('Login Failed! ' + error);
         } else {
+          //log the user details for debugging
           email = JSON.parse(window.localStorage[Database.session]).password.email;
           console.log('Current User: ' + email);
           console.log('Authenticated successfully with payload:' + authData);
@@ -167,7 +141,7 @@ angular.module('starter.services', [])
     var privateKey = $ionicCoreSettings.get('privateKey');
     var appId = $ionicCoreSettings.get('app_id');
 
-    // Encode your key
+    // Encode the private key
     var auth = btoa(privateKey + ':');
 
     var sendMessage = function(sender, message, token, callback) {
@@ -181,7 +155,7 @@ angular.module('starter.services', [])
           'Authorization': 'basic ' + auth
         },
         data: {
-          "tokens": [token], // will later change to format ['your', 'target', 'tokens']
+          "tokens": [token], // will need the following format for groups ['your', 'target', 'tokens']
           "notification": {
             "alert": sender,
             "android":{
