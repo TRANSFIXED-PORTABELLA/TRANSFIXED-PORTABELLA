@@ -25,7 +25,7 @@ angular.module('starter.services', [])
     };
   })
 
-  .factory('User', function($firebaseArray, $firebaseObject, Database, Escape) {
+  .factory('User', function($firebaseArray, $firebaseObject, Database, Escape, $state) {
 
     var checkExists = function(dataRef, username) {
       var doesExist;
@@ -66,10 +66,15 @@ angular.module('starter.services', [])
         return null;
       }
     };
+    var logout = function(Database, $state) {
+      Database.ref.unauth();
+      $state.go('auth');
+    };
 
     return {
       fetchUserByEmail: fetchUserByEmail,
-      isCurrentFriend: isCurrentFriend
+      isCurrentFriend: isCurrentFriend,
+      logout: logout
     };
   })
 

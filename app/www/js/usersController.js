@@ -65,6 +65,10 @@ angular.module('starter.usersController', ['ionic', 'starter.services'])
     $scope.removed = true;
   };
 
+  $scope.logout = function() {
+    User.logout(Database, $state);
+  };
+
   $scope.navToMessage = function() {
     $state.go('message');
   };
