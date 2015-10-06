@@ -16,6 +16,7 @@ angular.module('starter.usersController', ['ionic', 'starter.services'])
       $scope.notFound = false;
       $scope.added = false;
       $scope.removed = false;
+      $scope.identified = false;
       $scope.username = $scope.inputs.email;
       // Check if user is already a friend
       var isCurrentFriend = User.isCurrentFriend(searchEmail);
